@@ -1,8 +1,10 @@
 #pragma once
+#pragma warning(disable:4996)
 
 #include<iostream>
 #include<fstream>
 #include<string>
+#include<string.h>
 #include<stdlib.h>
 #include<time.h>
 using namespace std;
@@ -18,7 +20,7 @@ public:
 				array[i][j] = 0;
 			}
 		}
-		array[0][0] = (8 + 5) % 9 + 1;//Ñ§ºÅÄ©Î»
+		array[0][0] = (8 + 5) % 9 + 1;//å­¦å·æœ«ä½
 	}
 	sudoku(int array[9][9]) {
 		for (int i = 0; i < 9; i++) {
@@ -28,9 +30,9 @@ public:
 		}
 	}
 
-	bool isinraw(int num, int raw_num);//ÅĞ±ğ·û£ºÊı×ÖĞĞ´æÔÚ
-	bool isincolumn(int num, int c_num);//ÅĞ±ğ·û£ºÊı×ÖÁĞ´æÔÚ
-	bool isinblock(int num, int blocknum);//ÅĞ±ğ·û£ºÊı×Ö¿é´æÔÚ
+	bool rawf(int num, int raw_num);//åˆ¤åˆ«ç¬¦ï¼šæ•°å­—è¡Œå­˜åœ¨
+	bool colf(int num, int c_num);//åˆ¤åˆ«ç¬¦ï¼šæ•°å­—åˆ—å­˜åœ¨
+	bool blackf(int num, int blocknum);//åˆ¤åˆ«ç¬¦ï¼šæ•°å­—å—å­˜åœ¨
 	int insert(int num, int blocknum, int marked[]);
 	int insert(int num, int x, int y, int marked[]);
 	void getres(char *s, int &count_s);
@@ -39,28 +41,29 @@ public:
 
 void getsudoku(char * string, char *str, int &count_s);
 void solve(sudoku sudo, int x[], int y[], int total, int & count, char *str, int &count_s);
-bool isAllNum(char * string);
-void produce(int total, int nums[], int block_num, int & count_total, int count_nums, sudoku s, char *str, int &count_s);
+bool numf(char * string);
+void pdc(int total, int nums[], int block_num, int & count_total, int count_nums, sudoku s, char *str, int &count_s);
 void outputfile(char* s, int &count_s);
 
-int main(int argc, char* argv[])
-{
+int main(int argc,char* argv[]){
 	int total = 0;
 	const char *s1, *s2;
 	s1 = "-c";
 	s2 = "-s";
+	//argc = 20;
+	//strcpy(argv[0], "-c");
 
-	char * str = new char[100000];//ÓÃÀ´´æ´¢Êä³ö
+	char * str = new char[100000];//ç”¨æ¥å­˜å‚¨è¾“å‡º
 	int count_s = 0;
 
-	srand((unsigned)(time(NULL)));//Ëæ»úÊıÖÖ×Ó
+	srand((unsigned)(time(NULL)));//éšæœºæ•°ç§å­
 
 	int nums1[9] = { 7,1,2,3,4,5,6,8,9 };
 	int nums[9] = { 7, 0 };
 	int mark[8] = { 0 };
 	int count_total = 0;
 	sudoku s;
-	//Ëæ»ú³õÊ¼»¯
+	//éšæœºåˆå§‹åŒ–
 	for (int i = 1; i < 9; i++) {
 		int count = 0;
 		int move = (rand() % (8 - i + 1) + 1);
@@ -73,17 +76,15 @@ int main(int argc, char* argv[])
 				break;
 			}
 		}
-		//cout << nums[i] << " ";
 	}
-	//cout << endl;
 
 	if (argc < 3) {
 		cout << "the number of arguments is at least two" << endl;
 		return 0;
 	}
 	if (argc > 3) cout << "too many arguments " << endl;
-	if (strcmp(argv[1], s1) == 0) {//Éú³ÉÊı¶ÀÖÕ¾Ö
-		if (!isAllNum(argv[2])) {
+	if (strcmp(argv[1], s1) == 0) {//ç”Ÿæˆæ•°ç‹¬ç»ˆå±€
+		if (!numf(argv[2])) {
 			cout << "error: argument is not a positive integer" << endl;
 			return 0;
 		}
@@ -92,10 +93,10 @@ int main(int argc, char* argv[])
 			cout << "error: argument is not a positive integer" << endl;
 			return 0;
 		}
-		produce(total, nums, 1, count_total, 0, s, str, count_s);
+		pdc(total, nums, 1, count_total, 0, s, str, count_s);
 
 	}
-	else if (strcmp(argv[1], s2) == 0) {//½âÊı¶À
+	else if (strcmp(argv[1], s2) == 0) {//è§£æ•°ç‹¬
 
 		getsudoku(argv[2], str, count_s);
 
@@ -140,7 +141,7 @@ void getsudoku(char * string, char *str, int &count_s) {
 	}
 
 }
-
+//è§£æ•°ç‹¬
 void solve(sudoku sudo, int x[], int y[], int total, int & count, char *str, int &count_s) {
 	int marked[9] = { 0 };
 	int new_count = count;
@@ -163,7 +164,7 @@ void solve(sudoku sudo, int x[], int y[], int total, int & count, char *str, int
 
 }
 
-bool isAllNum(char * string) {
+bool numf(char * string) {
 	if (*string == '+') string++;
 	while (*string != '\0') {
 		if ((*string - '0') > 9 || (*string - '0') < 0) return false;
@@ -172,7 +173,7 @@ bool isAllNum(char * string) {
 	return true;
 }
 
-void produce(int total, int nums[], int block_num, int & count_total, int count_nums, sudoku s, char *str, int &count_s) {
+void pdc(int total, int nums[], int block_num, int & count_total, int count_nums, sudoku s, char *str, int &count_s) {
 	int marked[9] = { 0 };
 	int new_block_num, new_count_nums;
 
@@ -190,14 +191,14 @@ void produce(int total, int nums[], int block_num, int & count_total, int count_
 				new_count_nums = count_nums + 1;
 				new_block_num = 0;
 			}
-			else {//ÌîĞ´ÖÁ×îºóÒ»¸ö
+			else {//å¡«å†™è‡³æœ€åä¸€ä¸ª
 				count_total++;
-				s.getres(str, count_s);//´òÓ¡Êı¶À
+				s.getres(str, count_s);//æ‰“å°æ•°ç‹¬
 				s.del(0, new_block_num, now);
 				return;
 			}
 		}
-		produce(total, nums, new_block_num, count_total, new_count_nums, s, str, count_s);
+		pdc(total, nums, new_block_num, count_total, new_count_nums, s, str, count_s);
 		if (count_total == total) return;
 		s.del(0, new_block_num, now);
 	}
@@ -219,19 +220,19 @@ void outputfile(char *s, int &count_s) {
 }
 
 //function in sudoku
-bool sudoku::isinraw(int num, int raw_num) {//ĞĞ
+bool sudoku::rawf(int num, int raw_num) {//è¡Œ
 	for (int i = 0; i < 9; i++) {
 		if (this->array[raw_num][i] == num) return true;
 	}
 	return false;
 }
-bool sudoku::isincolumn(int num, int c_num) {//ÁĞ
+bool sudoku::colf(int num, int c_num) {//åˆ—
 	for (int i = 0; i < 9; i++) {
 		if (this->array[i][c_num] == num) return true;
 	}
 	return false;
 }
-bool sudoku::isinblock(int num, int blocknum) {//¿é
+bool sudoku::blackf(int num, int blocknum) {//å—
 	int x, y;
 	for (int i = 0; i < 3; i++) {
 		for (int j = 0; j < 3; j++) {
@@ -251,7 +252,7 @@ int sudoku::insert(int num, int blocknum, int marked[]) {
 	for (int i = 0; i < 9; i++) {
 		x = (pos[i] / 3) + ((blocknum - 1) / 3) * 3;
 		y = (pos[i] % 3) + (((blocknum - 1) % 3) * 3);
-		if (this->array[x][y] != 0 || marked[pos[i]] == 1 || this->isinraw(num, x) || this->isincolumn(num, y)) continue;
+		if (this->array[x][y] != 0 || marked[pos[i]] == 1 || this->rawf(num, x) || this->colf(num, y)) continue;
 		else {
 			this->array[x][y] = num;
 			return pos[i];
@@ -266,7 +267,7 @@ int sudoku::insert(int n, int x, int y, int marked[]) {
 	int blocknum = x / 3 * 3 + y / 3 + 1;
 
 	for (int i = 0; i < 9; i++) {
-		if (marked[num[i] - 1] == 1 || this->isinblock(num[i], blocknum) || this->isincolumn(num[i], y) || this->isinraw(num[i], x)) continue;
+		if (marked[num[i] - 1] == 1 || this->blackf(num[i], blocknum) || this->colf(num[i], y) || this->rawf(num[i], x)) continue;
 		else {
 			this->array[x][y] = num[i];
 			return num[i];
@@ -311,4 +312,3 @@ bool sudoku::del(int judge, int blocknum, int pos) {
 	this->array[x][y] = 0;
 	return true;
 }
-
